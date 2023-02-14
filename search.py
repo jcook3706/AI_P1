@@ -110,10 +110,12 @@ def depthFirstSearch(problem):
             break
         for successor in problem.getSuccessors(currentNode[0]):
             if successor[0] not in visited:
+                # print("Successor:", successor)
                 newMoveList = currentNode[1].copy()
                 newMoveList.append(successor[1])
                 stack.push((successor[0], newMoveList))
     moves = []
+    # print(currentNode)
     if currentNode[1][0] == 'S' or currentNode[1][0] == 'N' or currentNode[1][0] == 'E' or currentNode[1][0] == 'W':
         for move in currentNode[1]:
             if move == 'North':
