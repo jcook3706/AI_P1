@@ -384,15 +384,21 @@ def cornersHeuristic(state, problem):
 
     "*** YOUR CODE HERE ***"
     posx, posy, cornerBools = state
-    distance = 0
-    numCornersLeft = 0
+    minCorner = 100000
+    minCornerIndex = 0
+    maxCorner = 0
+    maxCornerIndex = 0
     for i in range(len(problem.corners)):
-        if cornerBools[i]:
-            numCornersLeft += 1
-            distance += util.manhattanDistance((posx, posy), problem.corners[i])
-    if(numCornersLeft>1):
-        distance += numCornersLeft
-    return distance/max(1, numCornersLeft)
+        if cornerBools[i] and util.manhattanDistance((posx, posy), problem.corners[i]) < minCorner:
+            minCorner = util.manhattanDistance((posx, posy), problem.corners[i])
+            minCornerIndex = i
+        if cornerBools[i] and util.manhattanDistance((posx, posy), problem.corners[i]) > maxCorner:
+            maxCorner = util.manhattanDistance((posx, posy), problem.corners[i])
+            maxCornerIndex = i
+    distance = util.manhattanDistance((posx, posy), problem.corners[maxCornerIndex])
+    if cornerBools == [False, False, False, False]:
+        return 0
+    return distance
     # return 0 # Default to trivial solution
 
 def getMinDistance():
@@ -425,7 +431,7 @@ class FoodSearchProblem:
         self.walls = startingGameState.getWalls()
         self.startingGameState = startingGameState
         self._expanded = 0 # DO NOT CHANGE
-        self.heuristicInfo = {} # A dictionary for the heuristic to store information
+        self.heuristicInfo = {0: startingGameState} # A dictionary for the heuristic to store information
 
     def getStartState(self):
         return self.start
@@ -497,14 +503,34 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    foodGridList = foodGrid.asList()
-    distance = 0
-    numFoodLeft = 0
-    for i in range(len(foodGridList)):
-        numFoodLeft += 1
-        distance += util.manhattanDistance(position, foodGridList[i])
-        # distance += mazeDistance(position, foodGridList[i], state)
-    return distance/max(1, numFoodLeft)
+    minFood = 100000
+    minFoodIndex = 0
+    maxFood = 0
+    maxFoodIndex = 0
+    for i in range(len(foodGrid.asList())):
+        if foodGrid.asList()[i] and util.manhattanDistance(position, foodGrid.asList()[i]) < minFood:
+            minFood = util.manhattanDistance(position, foodGrid.asList()[i])
+            minFoodIndex = i
+        if foodGrid.asList()[i] and util.manhattanDistance(position, foodGrid.asList()[i]) > maxFood:
+            maxFood = util.manhattanDistance(position, foodGrid.asList()[i])
+            maxFoodIndex = i
+    if len(foodGrid.asList()) == 0:
+        return 0
+    # elif len(foodGrid.asList()) == 1:
+    #     return util.manhattanDistance(position, foodGrid.asList()[minFoodIndex])
+    # else:
+    distance = util.manhattanDistance(position, foodGrid.asList()[minFoodIndex]) + util.manhattanDistance(foodGrid.asList()[minFoodIndex], foodGrid.asList()[maxFoodIndex])
+    # distance = mazeDistance(position, foodGrid.asList()[minFoodIndex], problem.state) + mazeDistance(foodGrid.asList()[minFoodIndex], foodGrid.asList()[maxFoodIndex], problem.state)
+    return distance
+#     foodGridList = foodGrid.asList()
+#     distance = 0
+#     numFoodLeft = 0
+#     for i in range(len(foodGridList)):
+#         numFoodLeft += 1
+#         distance += util.manhattanDistance(position, foodGridList[i])
+#         # distance += mazeDistance(position, foodGridList[i], state)
+#     return distance/max(1, numFoodLeft)
+# #######################################
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -608,6 +634,7 @@ def mazeDistance(point1, point2, gameState):
 
     This might be a useful helper function for your ApproximateSearchAgent.
     """
+    print(gameState)
     x1, y1 = point1
     x2, y2 = point2
     walls = gameState.getWalls()
