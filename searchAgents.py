@@ -502,8 +502,8 @@ def foodHeuristic(state, problem):
     numFoodLeft = 0
     for i in range(len(foodGridList)):
         numFoodLeft += 1
-        # distance += util.manhattanDistance(position, foodGridList[i])
-        distance += mazeDistance(position, foodGridList[i], state)
+        distance += util.manhattanDistance(position, foodGridList[i])
+        # distance += mazeDistance(position, foodGridList[i], state)
     return distance/max(1, numFoodLeft)
 
 class ClosestDotSearchAgent(SearchAgent):
